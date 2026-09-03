@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="theme-color" content="#12151c">
+<title>Spola</title>
+<link rel="stylesheet" href="spola.css?v=1">
+</head>
+<body>
+
+<!-- ======== SCHERMATA DI COLLEGAMENTO ======== -->
+<div id="setup" class="schermo">
+  <div class="pannello">
+    <h1 class="marchio">Spola</h1>
+    <p class="occhiello">Quello che incolli qui compare sull'altro dispositivo.</p>
+
+    <div id="setupScelta" class="blocco">
+      <button id="btnCrea" class="grosso primario">Crea un collegamento</button>
+      <button id="btnHoCodice" class="grosso">Ho gi&agrave; un codice</button>
+    </div>
+
+    <div id="setupCodice" class="blocco" hidden>
+      <p class="istruzioni">Sull'<b>altro</b> dispositivo apri Spola e inquadra il codice,
+         oppure scegli <i>Ho gi&agrave; un codice</i> e scrivi queste lettere.</p>
+      <div id="qr" class="qr"></div>
+      <div id="codiceMostrato" class="codice"></div>
+      <div class="fila">
+        <button id="btnCopiaCodice">Copia codice</button>
+        <button id="btnFatto" class="primario">Fatto</button>
+      </div>
+    </div>
+
+    <div id="setupInserisci" class="blocco" hidden>
+      <p class="istruzioni">Scrivi il codice che vedi sull'altro dispositivo.</p>
+      <input id="campoCodice" type="text" inputmode="latin" autocapitalize="characters"
+             spellcheck="false" placeholder="XXXX XXXX XXXX XXXX XXXX XXXX">
+      <p id="erroreCodice" class="errore" hidden>Codice non valido.</p>
+      <div class="fila">
+        <button id="btnIndietro">Indietro</button>
+        <button id="btnCollega" class="primario">Collega</button>
+      </div>
+    </div>
+
+    <p class="versione">v<span id="ver1">dev</span></p>
+  </div>
+</div>
+
+<!-- ======== APP ======== -->
+<div id="app" class="schermo" hidden>
+  <header>
+    <span class="marchio piccolo">Spola</span>
+    <span id="stato" class="stato collegando"><i></i><span id="statoTxt">collego&hellip;</span></span>
+    <button id="btnMenu" class="icona" aria-label="Impostazioni">&#9881;</button>
+  </header>
+
+  <div id="compositore">
+    <textarea id="campo" rows="2" placeholder="Incolla o scrivi qui&hellip;" spellcheck="false"></textarea>
+    <div class="fila azioni">
+      <button id="btnInvia" class="primario">Invia</button>
+      <button id="btnIncolla">Incolla</button>
+      <label class="comebottone" for="fileImg">Immagine</label>
+      <input type="file" id="fileImg" accept="image/*" multiple hidden>
+    </div>
+  </div>
+
+  <div id="avanzamento" hidden><div id="avanzamentoBarra"></div></div>
+
+  <ul id="lista"></ul>
+  <p id="vuoto" class="vuoto">Ancora niente.<br>Le cose restano qui per <b>12 ore</b>, le immagini per <b>3</b>.</p>
+</div>
+
+<!-- ======== MENU ======== -->
+<div id="menu" class="velo" hidden>
+  <div class="pannello">
+    <h2>Impostazioni</h2>
+    <button id="btnMostraCodice" class="grosso">Mostra il codice di collegamento</button>
+    <button id="btnSvuota" class="grosso">Svuota questa lista</button>
+    <button id="btnScollega" class="grosso pericolo">Scollega questo dispositivo</button>
+    <p class="notarella">Tutto viaggia cifrato. Il servizio che fa da ponte
+      (ntfy.sh) vede solo lettere e numeri senza senso.</p>
+    <p class="versione">v<span id="ver2">dev</span></p>
+    <button id="btnChiudiMenu" class="primario grosso">Chiudi</button>
+  </div>
+</div>
+
+<div id="brindisi" class="brindisi" hidden></div>
+
+<script src="qrcode.min.js?v=1"></script>
+<script src="spola.js?v=1"></script>
+</body>
+</html>
