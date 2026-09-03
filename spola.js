@@ -10,6 +10,8 @@ const SERVER   = 'https://ntfy.sh';
 const LS_SEME  = 'spola.seme';
 const LS_NASC  = 'spola.nascosti';
 const LS_DEV   = 'spola.dispositivo';
+const LS_TEMA  = 'spola.tema';
+const TEMI = [['notte','Notte'],['ambra','Ambra'],['bosco','Bosco'],['carta','Carta']];
 const MAX_CORPO = 3200;          // oltre, il testo viaggia come allegato
 const NATIVO = () => !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 
@@ -76,6 +78,31 @@ function mioId(){
 }
 const IO = mioId();
 const TIPO_DEV = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) ? 'telefono' : 'PC';
+
+/* ---------- temi ---------- */
+function applicaTema(id){
+  if (!TEMI.some(t => t[0] === id)) id = TEMI[0][0];
+  document.documentElement.dataset.tema = id;
+  localStorage.setItem(LS_TEMA, id);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = getComputedStyle(document.documentElement).getPropertyValue('--fondo').trim() || '#12151c';
+  document.querySelectorAll('.tema').forEach(b => b.classList.toggle('scelto', b.dataset.tema === id));
+}
+function costruisciTemi(){
+  const c = $('#temi'); if (!c) return;
+  c.innerHTML = '';
+  for (const [id, nome] of TEMI){
+    const b = document.createElement('button');
+    b.className = 'tema'; b.dataset.tema = id;
+    const pal = document.createElement('span'); pal.className = 'pallini';
+    pal.append(document.createElement('i'), document.createElement('i'));
+    const et = document.createElement('span'); et.textContent = nome;
+    b.append(pal, et);
+    b.addEventListener('click', () => applicaTema(id));
+    c.append(b);
+  }
+  applicaTema(localStorage.getItem(LS_TEMA) || TEMI[0][0]);
+}
 
 /* ---------- utilità interfaccia ---------- */
 let timerBrindisi = null;
@@ -373,6 +400,7 @@ function mostraCodice(){
 function avvio(){
   $('#ver1').textContent = VERSIONE; $('#ver2').textContent = VERSIONE;
   const v3 = $('#ver3'); if (v3) v3.textContent = VERSIONE;
+  costruisciTemi();
 
   if (!window.isSecureContext || !crypto.subtle){
     document.body.innerHTML = '<div class="schermo" style="padding:2rem;line-height:1.6">' +
