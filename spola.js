@@ -179,7 +179,8 @@ async function ricevi(m){
   if (!m.message) return;
 
   const meta = JSON.parse(dec.decode(await apri(unb64(m.message))));   // se non è nostro, qui esplode
-  const el = { id:m.id, meta, scade: (m.attachment && m.attachment.expires) || m.expires, url: m.attachment && m.attachment.url };
+  const el = { id:m.id, meta, tempo: (m.time || Date.now()/1000) * 1000,
+               scade: (m.attachment && m.attachment.expires) || m.expires, url: m.attachment && m.attachment.url };
 
   if (meta.tipo === 'testo'){ el.testo = meta.testo; }
   else if (meta.tipo === 'testolungo' || meta.tipo === 'immagine'){
@@ -211,7 +212,7 @@ function disegna(el){
   const r1 = document.createElement('div'); r1.className = 'riga1';
   const chi = document.createElement('span'); chi.className = 'chi';
   chi.textContent = daTelefono ? '\u{1F4F1} dal telefono' : '\u{1F4BB} dal PC';
-  const qn = document.createElement('span'); qn.className = 'quando'; qn.dataset.t = el.meta.t || Date.now();
+  const qn = document.createElement('span'); qn.className = 'quando'; qn.dataset.t = el.tempo;
   const sc = document.createElement('span'); sc.className = 'scad'; sc.dataset.s = el.scade || 0;
   r1.append(chi, qn, sc);
   if (el.meta.da === IO){ const q = document.createElement('span'); q.className = 'qui'; q.textContent = 'qui'; r1.append(q); }
@@ -242,7 +243,12 @@ function disegna(el){
   tasti.append(bottone('✕', 'via', () => { nascondi(el.id); li.remove(); if (!$('#lista').children.length) $('#vuoto').hidden = false; }));
 
   li.append(r1, corpo, tasti);
-  $('#lista').prepend(li);
+  /* in cima il piu' recente: si ordina sull'ora del server, non sull'ordine di
+     arrivo — un allegato da scaricare arriva dopo un testo, ma puo' essere piu' vecchio */
+  li.dataset.tempo = el.tempo;
+  const lista = $('#lista');
+  const dopo = [...lista.children].find(x => +x.dataset.tempo < el.tempo);
+  if (dopo) lista.insertBefore(li, dopo); else lista.append(li);
   aggiornaTempi();
 }
 function bottone(txt, cls, fn){
