@@ -139,8 +139,14 @@ button.icona{min-height:40px;padding:.3em .6em;font-size:1.1rem;background:trans
   border-radius:10px;background:#0b0d12;-webkit-touch-callout:default}
 .tasti{display:flex;gap:.45em;flex-wrap:wrap}
 .tasti>button{flex:1 1 auto;padding:.5em .7em;font-size:.9rem}
-.tasti>button.copia{flex:3 1 8em;background:var(--acc2);border-color:var(--acc);font-weight:600}
-.tasti>button.copia.fatto{background:#1d7a4c;border-color:var(--ok)}
+.tasti>button.copia{flex:3 1 8em;font-weight:700}
+/* il tasto principale porta il colore del dispositivo da cui arriva la cosa */
+.item.datel .tasti>button.copia{background:var(--tel);border-color:var(--tel);color:#07180e}
+.item.dapc  .tasti>button.copia{background:var(--pc); border-color:var(--pc); color:#06132c}
+/* copiato: si inverte, cosi' si vede su tutti e due i colori */
+.tasti>button.copia.fatto{background:var(--fondo);color:var(--testo)}
+.item.datel .tasti>button.copia.fatto{border-color:var(--tel);color:var(--tel)}
+.item.dapc  .tasti>button.copia.fatto{border-color:var(--pc); color:var(--pc)}
 .tasti>button.via{flex:0 0 auto;color:var(--smorto)}
 .scaduto{color:var(--smorto);font-style:italic;font-size:.9rem}
 
