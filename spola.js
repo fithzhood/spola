@@ -508,4 +508,21 @@ function avvio(){
   });
   window.addEventListener('online', () => { if (CANALE) ascolta(); });
 }
+/* ---------- quello che arriva dal menu "Condividi" di Android (solo APK) ----------
+   Lo chiama MainActivity quando qualcuno condivide qualcosa verso Spola. */
+window.__spolaIn = async function(tipo, dato){
+  try{
+    if (!CHIAVE){ brindisi('Prima collega Spola all\'altro dispositivo', 4000); return; }
+    if (tipo === 'testo'){
+      $('#campo').value = dato;
+      await inviaDalCampo();
+    } else if (tipo === 'immagine'){
+      const blob = await (await fetch(dato)).blob();
+      const est = (blob.type.split('/')[1] || 'jpg').replace('jpeg','jpg');
+      await inviaImmagini([ new File([blob], 'condivisa.' + est, {type: blob.type}) ]);
+    }
+  } catch (e){ brindisi('Non sono riuscito a mandare la cosa condivisa', 3600); }
+};
+
 avvio();
+if (NATIVO()) document.body.classList.add('capacitor');
