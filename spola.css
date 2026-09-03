@@ -11,6 +11,8 @@
   --ok:#3ddc84;
   --caldo:#ffb648;
   --male:#ff6b6b;
+  --tel:#3ddc84;
+  --pc:#7aa2ff;
   --raggio:14px;
 }
 *{box-sizing:border-box}
@@ -118,10 +120,15 @@ button.icona{min-height:40px;padding:.3em .6em;font-size:1.1rem;background:trans
   animation:entra .22s ease-out;
 }
 @keyframes entra{from{opacity:0;transform:translateY(-6px)}}
-.item.mio{border-left:3px solid var(--bordo)}
-.item.altrui{border-left:3px solid var(--acc)}
+.item.datel{border-left:3px solid var(--tel);
+  background:linear-gradient(100deg,rgba(61,220,132,.07),transparent 42%),var(--sup)}
+.item.dapc{border-left:3px solid var(--pc);
+  background:linear-gradient(100deg,rgba(122,162,255,.10),transparent 42%),var(--sup)}
 .riga1{display:flex;align-items:baseline;gap:.5em;flex-wrap:wrap;font-size:.74rem;color:var(--smorto)}
-.riga1 .chi{font-weight:600;color:var(--testo);opacity:.75}
+.riga1 .chi{font-weight:700}
+.item.datel .chi{color:var(--tel)}
+.item.dapc  .chi{color:var(--pc)}
+.riga1 .qui{border:1px solid var(--bordo);border-radius:999px;padding:0 .5em;font-size:.68rem;opacity:.75}
 .corpo{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default;
   line-height:1.45;word-break:break-word;white-space:pre-wrap;max-height:14em;overflow:auto}
 .corpo.link{white-space:normal}

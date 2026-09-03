@@ -203,16 +203,18 @@ async function ricevi(m){
 /* ================= DISEGNO ================= */
 function disegna(el){
   $('#vuoto').hidden = true;
+  const daTelefono = /telefono/i.test(el.meta.dev || '');
   const li = document.createElement('li');
-  li.className = 'item ' + (el.meta.da === IO ? 'mio' : 'altrui');
+  li.className = 'item ' + (daTelefono ? 'datel' : 'dapc');
   li.dataset.id = el.id;
 
   const r1 = document.createElement('div'); r1.className = 'riga1';
   const chi = document.createElement('span'); chi.className = 'chi';
-  chi.textContent = el.meta.da === IO ? 'da qui' : ('dal ' + (el.meta.dev || 'dispositivo'));
+  chi.textContent = daTelefono ? '\u{1F4F1} dal telefono' : '\u{1F4BB} dal PC';
   const qn = document.createElement('span'); qn.className = 'quando'; qn.dataset.t = el.meta.t || Date.now();
   const sc = document.createElement('span'); sc.className = 'scad'; sc.dataset.s = el.scade || 0;
   r1.append(chi, qn, sc);
+  if (el.meta.da === IO){ const q = document.createElement('span'); q.className = 'qui'; q.textContent = 'qui'; r1.append(q); }
 
   const corpo = document.createElement('div'); corpo.className = 'corpo';
   const tasti = document.createElement('div'); tasti.className = 'tasti';
