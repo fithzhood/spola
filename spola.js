@@ -372,6 +372,7 @@ function mostraCodice(){
 /* ================= AVVIO ================= */
 function avvio(){
   $('#ver1').textContent = VERSIONE; $('#ver2').textContent = VERSIONE;
+  const v3 = $('#ver3'); if (v3) v3.textContent = VERSIONE;
 
   if (!window.isSecureContext || !crypto.subtle){
     document.body.innerHTML = '<div class="schermo" style="padding:2rem;line-height:1.6">' +
