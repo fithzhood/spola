@@ -106,9 +106,9 @@ header{
   padding-top:calc(.55rem + env(safe-area-inset-top));
 }
 header .marchio{flex:0 0 auto}
-/* la versione accanto al nome, appoggiata alla riga di base: pedice, non apice */
-.verhead{flex:0 0 auto;font-size:.62rem;opacity:.42;align-self:flex-end;
-  margin:0 0 .18em -.1em;letter-spacing:.02em;color:var(--smorto)}
+/* la versione a fianco del nome, sulla stessa riga: ne' apice ne' pedice */
+.verhead{flex:0 0 auto;font-size:.72rem;opacity:.5;align-self:center;
+  margin:0;letter-spacing:.02em;color:var(--smorto)}
 .stato{
   flex:1 1 0;min-width:0;display:flex;align-items:center;gap:.4em;
   color:var(--smorto);font-size:.8rem;overflow:hidden;
