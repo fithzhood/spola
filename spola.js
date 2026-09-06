@@ -498,7 +498,7 @@ function avvio(){
   $('#btnMostraCodice').onclick = () => { $('#menu').hidden = true; mostraCodice(); };
   $('#btnSvuotaTutti').onclick = async () => {
     const ids = [...$('#lista').children].map(li => li.dataset.id).filter(Boolean);
-    if (!ids.length){ brindisi('Non c'e' niente da togliere'); return; }
+    if (!ids.length){ brindisi("Non c'e' niente da togliere"); return; }
     $('#menu').hidden = true;
     await ritira(ids);
   };
