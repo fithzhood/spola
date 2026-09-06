@@ -170,6 +170,8 @@ button.icona{min-height:40px;padding:.3em .6em;font-size:1.1rem;background:trans
 .item.datel .tasti>button.copia.fatto{border-color:var(--tel);color:var(--tel)}
 .item.dapc  .tasti>button.copia.fatto{border-color:var(--pc); color:var(--pc)}
 .tasti>button.via{flex:0 0 auto;color:var(--smorto)}
+.tasti .chiedi{flex:0 0 auto;align-self:center;font-size:.82rem;color:var(--smorto);padding-right:.2em}
+.tasti>button.pericolo{flex:1 1 auto;color:var(--male);border-color:var(--male)}
 .scaduto{color:var(--smorto);font-style:italic;font-size:.9rem}
 
 /* ---- velo/menu ---- */

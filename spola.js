@@ -9,6 +9,7 @@ const VERSIONE = (VER.match(/\d+/) || ['dev'])[0];
 const SERVER   = 'https://ntfy.sh';
 const LS_SEME  = 'spola.seme';
 const LS_NASC  = 'spola.nascosti';
+const LS_REV   = 'spola.revocati';
 const LS_DEV   = 'spola.dispositivo';
 const LS_TEMA  = 'spola.tema';
 const TEMI = [['notte','Notte'],['ambra','Ambra'],['bosco','Bosco'],['carta','Carta']];
@@ -130,6 +131,33 @@ function fraQuanto(unix){
 const nascosti = () => { try { return JSON.parse(localStorage.getItem(LS_NASC) || '[]'); } catch { return []; } };
 const nascondi = id => { const n = nascosti(); n.push(id); localStorage.setItem(LS_NASC, JSON.stringify(n.slice(-400))); };
 
+/* Ritiri: ntfy non permette di cancellare niente dal server, quindi si manda sul
+   canale un ordine di ritiro cifrato. Ogni dispositivo se lo segna e toglie
+   l'elemento dalla propria lista, anche se era spento e riapre piu' tardi. */
+const revocati = () => { try { return JSON.parse(localStorage.getItem(LS_REV) || '[]'); } catch { return []; } };
+function segnaRevocati(ids){
+  const r = revocati();
+  for (const id of ids) if (!r.includes(id)) r.push(id);
+  localStorage.setItem(LS_REV, JSON.stringify(r.slice(-600)));
+}
+function toglieDaSchermo(ids){
+  for (const id of ids){
+    const li = document.querySelector('#lista .item[data-id="' + id + '"]');
+    if (li) li.remove();
+    ELEMENTI.delete(id);
+  }
+  if (!$('#lista').children.length) $('#vuoto').hidden = false;
+}
+async function ritira(ids){
+  if (!ids.length) return;
+  segnaRevocati(ids); toglieDaSchermo(ids);
+  for (let i = 0; i < ids.length; i += 80){          // il corpo di ntfy sta in 4 KB
+    const meta = { v:1, da:IO, dev:TIPO_DEV, tipo:'revoca', t: Date.now(), ids: ids.slice(i, i+80) };
+    await inviaPost(b64(await sigilla(enc.encode(JSON.stringify(meta)))));
+  }
+  brindisi(ids.length === 1 ? 'Tolto da tutti i dispositivi' : ('Tolti ' + ids.length + ' da tutti i dispositivi'));
+}
+
 /* ================= INVIO ================= */
 async function pubblicaTesto(testo){
   const t = testo.trim(); if (!t) return;
@@ -202,13 +230,18 @@ function ascolta(){
 async function ricevi(m){
   if (!m.id || VISTI.has(m.id)) return;
   VISTI.add(m.id);
-  if (nascosti().includes(m.id)) return;
+  if (nascosti().includes(m.id) || revocati().includes(m.id)) return;
   if (!m.message) return;
 
   const meta = JSON.parse(dec.decode(await apri(unb64(m.message))));   // se non è nostro, qui esplode
   const el = { id:m.id, meta, tempo: (m.time || Date.now()/1000) * 1000,
                scade: (m.attachment && m.attachment.expires) || m.expires, url: m.attachment && m.attachment.url };
 
+  if (meta.tipo === 'revoca'){                       // un altro dispositivo ha ritirato qualcosa
+    const ids = Array.isArray(meta.ids) ? meta.ids : [];
+    segnaRevocati(ids); toglieDaSchermo(ids);
+    return;
+  }
   if (meta.tipo === 'testo'){ el.testo = meta.testo; }
   else if (meta.tipo === 'testolungo' || meta.tipo === 'immagine'){
     if (!el.url) return;
@@ -229,6 +262,22 @@ async function ricevi(m){
 }
 
 /* ================= DISEGNO ================= */
+/* Il tasto di rimozione non decide da solo: mette in riga le due strade.
+   "Solo qui" nasconde in locale, "Da tutti" manda l'ordine di ritiro sul canale. */
+function chiediTolta(li, el, tasti){
+  const prima = [...tasti.children];
+  const rimetti = () => { tasti.innerHTML = ''; prima.forEach(b => tasti.append(b)); };
+  tasti.innerHTML = '';
+  const eti = document.createElement('span'); eti.className = 'chiedi'; eti.textContent = 'Togli';
+  tasti.append(eti);
+  tasti.append(bottone('Solo qui', '', () => {
+    nascondi(el.id); li.remove();
+    if (!$('#lista').children.length) $('#vuoto').hidden = false;
+  }));
+  tasti.append(bottone('Da tutti', 'pericolo', () => ritira([el.id])));
+  tasti.append(bottone('↩', 'via', rimetti));
+}
+
 function disegna(el){
   $('#vuoto').hidden = true;
   const daTelefono = /telefono/i.test(el.meta.dev || '');
@@ -267,7 +316,7 @@ function disegna(el){
       tasti.append(bottone('Copia', 'copia', b => copiaTesto(el.testo, b)));
     }
   }
-  tasti.append(bottone('✕', 'via', () => { nascondi(el.id); li.remove(); if (!$('#lista').children.length) $('#vuoto').hidden = false; }));
+  tasti.append(bottone('✕', 'via', () => chiediTolta(li, el, tasti)));
 
   li.append(r1, corpo, tasti);
   /* in cima il piu' recente: si ordina sull'ora del server, non sull'ordine di
@@ -447,12 +496,18 @@ function avvio(){
   $('#btnChiudiMenu').onclick = () => { $('#menu').hidden = true; };
   $('#menu').onclick = e => { if (e.target === $('#menu')) $('#menu').hidden = true; };
   $('#btnMostraCodice').onclick = () => { $('#menu').hidden = true; mostraCodice(); };
+  $('#btnSvuotaTutti').onclick = async () => {
+    const ids = [...$('#lista').children].map(li => li.dataset.id).filter(Boolean);
+    if (!ids.length){ brindisi('Non c'e' niente da togliere'); return; }
+    $('#menu').hidden = true;
+    await ritira(ids);
+  };
   $('#btnSvuota').onclick = () => {
     [...$('#lista').children].forEach(li => nascondi(li.dataset.id));
     $('#lista').innerHTML = ''; $('#vuoto').hidden = false; $('#menu').hidden = true;
   };
   $('#btnScollega').onclick = () => {
-    localStorage.removeItem(LS_SEME); localStorage.removeItem(LS_NASC);
+    localStorage.removeItem(LS_SEME); localStorage.removeItem(LS_NASC); localStorage.removeItem(LS_REV);
     if (ES) ES.close();
     location.reload();
   };
