@@ -148,13 +148,31 @@ function toglieDaSchermo(ids){
   }
   if (!$('#lista').children.length) $('#vuoto').hidden = false;
 }
+/* Prima si pubblica, poi si toglie da schermo: al contrario, un ritiro respinto
+   (ntfy ha un limite di frequenza) faceva sparire la cosa qui e restare sugli
+   altri dispositivi, senza dire niente a nessuno. */
+async function conRitenti(fn, quanti = 3){
+  for (let n = 0; ; n++){
+    try { return await fn(); }
+    catch (e){
+      if (n >= quanti - 1) throw e;
+      await new Promise(r => setTimeout(r, 700 * (n + 1)));
+    }
+  }
+}
 async function ritira(ids){
   if (!ids.length) return;
-  segnaRevocati(ids); toglieDaSchermo(ids);
-  for (let i = 0; i < ids.length; i += 80){          // il corpo di ntfy sta in 4 KB
-    const meta = { v:1, da:IO, dev:TIPO_DEV, tipo:'revoca', t: Date.now(), ids: ids.slice(i, i+80) };
-    await inviaPost(b64(await sigilla(enc.encode(JSON.stringify(meta)))));
+  try {
+    for (let i = 0; i < ids.length; i += 80){        // il corpo di ntfy sta in 4 KB
+      const meta = { v:1, da:IO, dev:TIPO_DEV, tipo:'revoca', t: Date.now(), ids: ids.slice(i, i+80) };
+      const corpo = b64(await sigilla(enc.encode(JSON.stringify(meta))));
+      await conRitenti(() => inviaPost(corpo));
+    }
+  } catch (e){
+    brindisi('Ritiro non riuscito, riprova fra un momento', 3600);
+    return;                                          // non si tocca niente: lo schermo resta onesto
   }
+  segnaRevocati(ids); toglieDaSchermo(ids);
   brindisi(ids.length === 1 ? 'Tolto da tutti i dispositivi' : ('Tolti ' + ids.length + ' da tutti i dispositivi'));
 }
 
