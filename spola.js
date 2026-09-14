@@ -79,6 +79,8 @@ function mioId(){
 }
 const IO = mioId();
 const TIPO_DEV = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) ? 'telefono' : 'PC';
+// il tasto Invia prende il colore del dispositivo da cui si scrive (vedi spola.css)
+document.body.classList.add(TIPO_DEV === 'telefono' ? 'su-telefono' : 'su-pc');
 
 /* ---------- temi ---------- */
 function applicaTema(id){

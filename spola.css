@@ -218,3 +218,8 @@ body.trascino::after{
 .tema[data-tema="ambra"] i:first-child{background:#ffc247} .tema[data-tema="ambra"] i+i{background:#56d9ff}
 .tema[data-tema="bosco"] i:first-child{background:#c2ff4d} .tema[data-tema="bosco"] i+i{background:#b48cff}
 .tema[data-tema="carta"] i:first-child{background:#00925a} .tema[data-tema="carta"] i+i{background:#6b4cff}
+
+/* il tasto Invia porta il colore del dispositivo da cui parte il messaggio:
+   lo stesso che quel messaggio avra' nella lista, in ogni tema */
+body.su-telefono #btnInvia{background:var(--tel);border-color:var(--tel);color:var(--tel-testo)}
+body.su-pc       #btnInvia{background:var(--pc); border-color:var(--pc); color:var(--pc-testo)}
