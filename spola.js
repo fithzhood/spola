@@ -277,6 +277,11 @@ async function ricevi(m){
     }
   } else return;
 
+  /* Un'immagine va scaricata, e mentre si scarica puo' arrivare il suo ritiro:
+     toglieDaSchermo non la trova (non e' ancora disegnata) e, finito lo scarico,
+     ricompariva. Si ricontrolla qui, dopo l'attesa, e non solo all'ingresso. */
+  if (nascosti().includes(m.id) || revocati().includes(m.id)) return;
+
   ELEMENTI.set(m.id, el);
   disegna(el);
 }
