@@ -583,7 +583,15 @@ function avvio(){
 }
 /* ---------- quello che arriva dal menu "Condividi" di Android (solo APK) ----------
    Lo chiama MainActivity quando qualcuno condivide qualcosa verso Spola. */
+/* La Galleria Samsung lancia la condivisione con flag che fanno arrivare lo stesso
+   intent due volte di fila all'app: qui si scarta un doppione identico entro pochi
+   secondi. Il rimedio vero sta in MainActivity; questo copre anche gli APK vecchi. */
+let ultimaCondivisione = { impronta: '', quando: 0 };
 window.__spolaIn = async function(tipo, dato){
+  const impronta = tipo + ':' + String(dato).length + ':' + String(dato).slice(0, 64) + String(dato).slice(-64);
+  const ora = Date.now();
+  if (impronta === ultimaCondivisione.impronta && ora - ultimaCondivisione.quando < 5000) return;
+  ultimaCondivisione = { impronta, quando: ora };
   try{
     if (!CHIAVE){ brindisi('Prima collega Spola all\'altro dispositivo', 4000); return; }
     if (tipo === 'testo'){
